@@ -1,0 +1,258 @@
+<project name="Build example" default="all" basedir=".">
+    <!-- ##############################################################################################
+    ##                                      source folder                                            ##
+    ################################################################################################-->
+    <property name="SRC_DIR" value="src" description="Source folder" />
+    <property name="SRC_IMG_DIR" value="${SRC_DIR}/img" description="img source folder" />
+    <property name="SRC_ICO_DIR" value="${SRC_DIR}/icons" description="icon source folder" />
+    <property name="SRC_CSS_DIR" value="${SRC_DIR}/css" description="Source folder" />
+    <property name="SRC_JS_DIR" value="${SRC_DIR}/js" description="Source folder" />
+
+    <!-- ##############################################################################################
+    ##                                      distribution folder                                            ##
+    ################################################################################################-->
+    <property name="DIST_DIR" value="dist" description="Output folder for build targets" />
+    <property name="DIST_IMG_DIR" value="${DIST_DIR}/img" description="Output folder for image files" />
+    <property name="DIST_ICO_DIR" value="${DIST_DIR}/icons" description="Output folder for icons files" />
+    <property name="DIST_CSS_DIR" value="${DIST_DIR}/css" description="Output folder for css files" />
+    <property name="DIST_JS_DIR" value="${DIST_DIR}/js" description="Output folder for js files" />
+
+    <!-- ##############################################################################################
+    ##                                 build folder and programms                                    ##
+    ################################################################################################-->
+    <property name="BUILD_DIR" value="build" description="Files needed to build" />
+    <!-- Programme -->
+    <property name="OPTI" value="${BUILD_DIR}/optipng.exe" description="Optipng" />
+    <property name="YUI" value="${BUILD_DIR}/yuicompressor-2.4.7.jar" description="YUICompressor" />
+
+    <!-- ##############################################################################################
+    ##                                   file names for distribution                                 ##
+    ################################################################################################-->
+    <property name="CSS" value="style.css" />
+    <property name="CSS_MIN" value="style.min.css" />
+    <property name="JS" value="scripts.js" />
+    <property name="JS_MIN" value="scripts.min.js" />
+
+    <!--  ant addition for build files -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+            <pathelement location="${BUILD_DIR}/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!-- ##############################################################################################
+    ##                                      build targets                                            ##
+    ################################################################################################-->
+
+    <!-- ####################### copies files from base folder to dist folder ######################-->
+    <target name="html" description="Copy HTML files to the output folder">
+        <mkdir dir="${DIST_DIR}" />
+        <copy todir="${DIST_DIR}">
+            <fileset dir="${SRC_DIR}">
+                <include name="*.*" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ############## concatenate css files and copies style.css to dist folder ###################-->
+    <target name="css" depends="html" description="Concatenate CSS source files">
+        <echo message="Building ${CSS}" />
+        <concat destfile="${DIST_CSS_DIR}/${CSS}">
+            <fileset dir="${SRC_CSS_DIR}" includes="normalize.css" />
+            <fileset dir="${SRC_CSS_DIR}" includes="global.css" />
+            <fileset dir="${SRC_CSS_DIR}" includes="yafg.css" />
+            <fileset dir="${SRC_CSS_DIR}" includes="default.css" />
+        </concat>
+        <echo message="${CSS} built." />
+    </target>
+
+    <!-- #################### minifies style.css and saves it as style.min.css #####################-->
+    <target name="css.min" depends="css" description="Minimize CSS files">
+        <echo message="Building ${CSS_MIN}" />
+        <apply executable="java" parallel="false" verbose="true" dest="${DIST_CSS_DIR}">
+            <fileset dir="${DIST_CSS_DIR}">
+                <include name="style.css" />
+            </fileset>
+            <arg line="-jar" />
+            <arg path="${YUI}" />
+            <arg value="--charset" />
+            <arg value="ANSI" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="${CSS}" to="${CSS_MIN}" />
+        </apply>
+        <echo message="${CSS_MIN} built." />
+    </target>
+
+    <!-- #### concatenate plugins.js and scripts.js files and copies scripts.js to dist folder ####-->
+    <target name="js" depends="html" description="Concatenate JavaScript source files">
+        <echo message="Building ${JS}" />
+        <concat destfile="${DIST_JS_DIR}/${JS}">
+            <fileset dir="${SRC_JS_DIR}" includes="scripts.js" />
+            <fileset dir="${SRC_JS_DIR}" includes="plugins.js" />
+        </concat>
+        <copy todir="${DIST_JS_DIR}">
+            <fileset dir="${SRC_JS_DIR}">
+                <include name="html5shiv.js" />
+                <include name="respond.src.js" />                
+            </fileset>
+        </copy>
+        <echo message="${JS} built." />
+    </target>
+
+    <!-- ##################### minifies *.js and saves it as *.min.js ######################-->
+    <target name="js.min" depends="js" description="Minimize JavaScript files">
+        <echo message="Building ${JS_MIN}" />
+        <apply executable="java" parallel="false" verbose="true" dest="${DIST_JS_DIR}">
+            <fileset dir="${DIST_JS_DIR}">
+                <include name="scripts.js" />
+            </fileset>
+            <arg line="-jar" />
+            <arg path="${YUI}" />
+            <arg value="--charset" />
+            <arg value="ANSI" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="scripts.js" to="scripts.min.js" />
+        </apply>
+
+        <apply executable="java" parallel="false" verbose="true" dest="${DIST_JS_DIR}">
+            <fileset dir="${DIST_JS_DIR}">
+                <include name="html5shiv.js" />
+            </fileset>
+            <arg line="-jar" />
+            <arg path="${YUI}" />
+            <arg value="--charset" />
+            <arg value="ANSI" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="html5shiv.js" to="html5shiv.min.js" />
+        </apply>
+
+        <apply executable="java" parallel="false" verbose="true" dest="${DIST_JS_DIR}">
+            <fileset dir="${DIST_JS_DIR}">
+                <include name="respond.src.js" />
+            </fileset>
+            <arg line="-jar" />
+            <arg path="${YUI}" />
+            <arg value="--charset" />
+            <arg value="ANSI" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="respond.src.js" to="respond.min.js" />
+        </apply>
+        <echo message="${JS_MIN} built." />
+    </target>
+
+    <!-- ############### optimizes png files and saves them in the dist folder ################-->
+    <target name="imagespng" description="(PRIVATE) Optimizes .png images using optipng">
+        <echo message="Optimizing images..."/>
+        <echo message="This part might take a while. But everything else is already done."/>
+        <echo message=" "/>
+        <echo message="First, we run optipng on the .png files..."/>
+        <mkdir dir="${DIST_IMG_DIR}" />
+        <mkdir dir="${DIST_ICO_DIR}" />
+        <delete>
+            <fileset dir="${DIST_IMG_DIR}">
+                 <include name="**/*.png"/>
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${DIST_ICO_DIR}">
+                 <include name="**/*.png"/>
+            </fileset>
+        </delete>
+        <if>
+            <and>
+                <os family="unix" />
+                <available file="optipng" filepath="/usr/bin" />
+            </and>
+            <then>
+                <apply executable="/usr/bin/optipng" dest="${DIST_IMG_DIR}" osfamily="unix">
+                    <fileset dir="${SRC_IMG_DIR}" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
+                    <arg value="-quiet"/>
+                    <arg value="-o7"/>
+                    <arg value="-out"/>
+                    <targetfile/>
+                    <srcfile/>
+                    <mapper type="identity"/>
+                </apply>
+                <apply executable="/usr/bin/optipng" dest="${DIST_ICO_DIR}" osfamily="unix">
+                    <fileset dir="${SRC_ICO_DIR}" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
+                    <arg value="-quiet"/>
+                    <arg value="-o7"/>
+                    <arg value="-out"/>
+                    <targetfile/>
+                    <srcfile/>
+                    <mapper type="identity"/>
+                </apply>
+            </then>
+            <elseif>
+                <os family="unix" />
+                <then>
+                    <echo message="*** optipng NOT INSTALLED. SKIPPING OPTIMIZATION OF PNGs." />
+                    <echo message="*** Install optipng to enable png optimization." />
+                    <echo message="*** For instructions see 'Dependencies' at: http://html5boilerplate.com/docs/#Build-script#dependencies" />
+                </then>
+            </elseif>
+            <elseif>
+                <os family="windows" />
+                <then>
+                    <apply executable="${OPTI}" dest="${DIST_IMG_DIR}" osfamily="windows">
+                        <fileset dir="${SRC_IMG_DIR}" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
+                        <arg value="-quiet"/>
+                        <arg value="-o7"/>
+                        <arg value="-out"/>
+                        <targetfile/>
+                        <srcfile/>
+                        <mapper type="identity"/>
+                    </apply>
+                </then>
+            </elseif>
+        </if>
+    </target>
+
+    <!-- ####### edits html files to include the minified versions of the js and css files ###########-->
+    <target name="file_names">
+        <replaceregexp byline="true">
+            <regexp pattern="style.css"/>
+            <substitution expression="style.min.css"/>
+            <fileset dir="${DIST_DIR}">
+                <include name="*.html"/>
+            </fileset>
+        </replaceregexp>
+        <replaceregexp byline="true">
+            <regexp pattern="html5shiv.js"/>
+            <substitution expression="html5shiv.min.js"/>
+            <fileset dir="${DIST_DIR}">
+                <include name="*.html"/>
+            </fileset>
+        </replaceregexp>
+        <replaceregexp byline="true">
+            <regexp pattern="respond.js"/>
+            <substitution expression="respond.min.js"/>
+            <fileset dir="${DIST_DIR}">
+                <include name="*.html"/>
+            </fileset>
+        </replaceregexp>
+        <replaceregexp byline="true">
+            <regexp pattern="scripts.js"/>
+            <substitution expression="scripts.min.js"/>
+            <fileset dir="${DIST_DIR}">
+                <include name="*.html"/>
+            </fileset>
+        </replaceregexp>
+    </target>    
+
+    <target name="clean">
+        <delete dir="${DIST_DIR}" />
+    </target>
+
+    <target name="all" depends="clean, html, css, css.min, js, js.min, imagespng, file_names">
+        <echo message="Build complete." />
+    </target>
+
+    <target name="cam" depends="html, css, css.min, js, js.min, file_names">
+        <echo message="Build complete." />
+    </target>
+</project>
