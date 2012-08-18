@@ -61,6 +61,7 @@
             <fileset dir="${SRC_CSS_DIR}" includes="normalize.css" />
             <fileset dir="${SRC_CSS_DIR}" includes="global.css" />
             <fileset dir="${SRC_CSS_DIR}" includes="yafg.css" />
+            <fileset dir="${SRC_CSS_DIR}" includes="camera.css" />
             <fileset dir="${SRC_CSS_DIR}" includes="default.css" />
         </concat>
         <echo message="${CSS} built." />
@@ -84,25 +85,20 @@
         <echo message="${CSS_MIN} built." />
     </target>
 
-    <!-- #### concatenate plugins.js and scripts.js files and copies scripts.js to dist folder ####-->
-    <target name="js" depends="html" description="Concatenate JavaScript source files">
-        <echo message="Building ${JS}" />
-        <concat destfile="${DIST_JS_DIR}/${JS}">
-            <fileset dir="${SRC_JS_DIR}" includes="scripts.js" />
-            <fileset dir="${SRC_JS_DIR}" includes="plugins.js" />
-        </concat>
+
+    <!-- ##################### minifies *.js and saves it as *.min.js ######################-->
+    <target name="js.min" depends="html" description="Minimize JavaScript files">
+        <echo message="Building ${JS_MIN}" />
+
         <copy todir="${DIST_JS_DIR}">
             <fileset dir="${SRC_JS_DIR}">
                 <include name="html5shiv.js" />
-                <include name="respond.src.js" />                
+                <include name="respond.src.js" />
+                <include name="plugins.js" />  
+                <include name="scripts.js" />             
             </fileset>
         </copy>
-        <echo message="${JS} built." />
-    </target>
 
-    <!-- ##################### minifies *.js and saves it as *.min.js ######################-->
-    <target name="js.min" depends="js" description="Minimize JavaScript files">
-        <echo message="Building ${JS_MIN}" />
         <apply executable="java" parallel="false" verbose="true" dest="${DIST_JS_DIR}">
             <fileset dir="${DIST_JS_DIR}">
                 <include name="scripts.js" />
@@ -114,6 +110,19 @@
             <arg value="-o" />
             <targetfile />
             <mapper type="glob" from="scripts.js" to="scripts.min.js" />
+        </apply>
+
+        <apply executable="java" parallel="false" verbose="true" dest="${DIST_JS_DIR}">
+            <fileset dir="${DIST_JS_DIR}">
+                <include name="plugins.js" />
+            </fileset>
+            <arg line="-jar" />
+            <arg path="${YUI}" />
+            <arg value="--charset" />
+            <arg value="ANSI" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="plugins.js" to="plugins.min.js" />
         </apply>
 
         <apply executable="java" parallel="false" verbose="true" dest="${DIST_JS_DIR}">
@@ -186,6 +195,22 @@
                     <srcfile/>
                     <mapper type="identity"/>
                 </apply>
+
+                <if>
+                    <available file="${SRC_IMG_DIR}/slides" type="dir" />
+                    <then>
+                        <apply executable="/usr/bin/optipng" dest="${DIST_IMG_DIR}/slides" osfamily="unix">
+                            <fileset dir="${SRC_IMG_DIR}/slides" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
+                            <arg value="-quiet"/>
+                            <arg value="-o7"/>
+                            <arg value="-out"/>
+                            <targetfile/>
+                            <srcfile/>
+                            <mapper type="identity"/>
+                        </apply>
+                    </then>
+                </if>
+
             </then>
             <elseif>
                 <os family="unix" />
@@ -207,6 +232,22 @@
                         <srcfile/>
                         <mapper type="identity"/>
                     </apply>
+
+                    <if>
+                        <available file="${SRC_IMG_DIR}/slides" type="dir" />
+                    <then>
+                        <echo message="stuff" />
+                        <apply executable="/usr/bin/optipng" dest="${DIST_IMG_DIR}/slides" osfamily="unix">
+                            <fileset dir="${SRC_IMG_DIR}/slides" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
+                            <arg value="-quiet"/>
+                            <arg value="-o7"/>
+                            <arg value="-out"/>
+                            <targetfile/>
+                            <srcfile/>
+                            <mapper type="identity"/>
+                        </apply>
+                    </then>
+                </if>
                 </then>
             </elseif>
         </if>
@@ -242,17 +283,24 @@
                 <include name="*.html"/>
             </fileset>
         </replaceregexp>
+        <replaceregexp byline="true">
+            <regexp pattern="plugins.js"/>
+            <substitution expression="plugins.min.js"/>
+            <fileset dir="${DIST_DIR}">
+                <include name="*.html"/>
+            </fileset>
+        </replaceregexp>
     </target>    
 
     <target name="clean">
         <delete dir="${DIST_DIR}" />
     </target>
 
-    <target name="all" depends="clean, html, css, css.min, js, js.min, imagespng, file_names">
+    <target name="all" depends="clean, html, css, css.min, js.min, imagespng, file_names">
         <echo message="Build complete." />
     </target>
 
-    <target name="cam" depends="html, css, css.min, js, js.min, file_names">
+    <target name="cam" depends="html, css, css.min, js.min, file_names">
         <echo message="Build complete." />
     </target>
 </project>

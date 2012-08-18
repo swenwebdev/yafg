@@ -84,14 +84,11 @@ object { max-width: 100%; }
 		margin-right: 3.2%;
 	}
 
-	/** 
-	* last-of-type pseudo class removes the right margin
-	* from the last span element of a row 
-	**/
-	[class*='span']:last-of-type {
-  		margin-right: 0;
-	}
 
+	/* class to remove margin from last col in a row */
+	.last { margin-right: 0; }
+
+	/* colum width percentages for yet another fluid grid */
 	.span1 { width: 5.4%; }
 	.span2 { width: 14%; }
 	.span3 { width: 22.6%; }
@@ -105,6 +102,7 @@ object { max-width: 100%; }
 	.span11 { width: 91.4%; }
 	.span12 { width: 100%; }
 
+	/* offset to apply a margin left of a colum */
 	.offset1 { margin-left: 8.6%; }
 	.offset2 { margin-left: 17.2%; }
 	.offset3 { margin-left: 25.8%; }
