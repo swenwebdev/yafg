@@ -160,6 +160,7 @@
         <echo message=" "/>
         <echo message="First, we run optipng on the .png files..."/>
         <mkdir dir="${DIST_IMG_DIR}" />
+        <mkdir dir="${DIST_IMG_DIR}/slides" />
         <mkdir dir="${DIST_ICO_DIR}" />
         <delete>
             <fileset dir="${DIST_IMG_DIR}">
@@ -236,8 +237,7 @@
                     <if>
                         <available file="${SRC_IMG_DIR}/slides" type="dir" />
                     <then>
-                        <echo message="stuff" />
-                        <apply executable="/usr/bin/optipng" dest="${DIST_IMG_DIR}/slides" osfamily="unix">
+                        <apply executable="${OPTI}" dest="${DIST_IMG_DIR}/slides" osfamily="windows">
                             <fileset dir="${SRC_IMG_DIR}/slides" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
                             <arg value="-quiet"/>
                             <arg value="-o7"/>
