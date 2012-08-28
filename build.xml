@@ -62,6 +62,7 @@
             <fileset dir="${SRC_CSS_DIR}" includes="global.css" />
             <fileset dir="${SRC_CSS_DIR}" includes="yafg.css" />
             <fileset dir="${SRC_CSS_DIR}" includes="camera.css" />
+            <fileset dir="${SRC_CSS_DIR}" includes="jquery.fancybox.css" />
             <fileset dir="${SRC_CSS_DIR}" includes="default.css" />
         </concat>
         <echo message="${CSS} built." />
@@ -160,7 +161,6 @@
         <echo message=" "/>
         <echo message="First, we run optipng on the .png files..."/>
         <mkdir dir="${DIST_IMG_DIR}" />
-        <mkdir dir="${DIST_IMG_DIR}/slides" />
         <mkdir dir="${DIST_ICO_DIR}" />
         <delete>
             <fileset dir="${DIST_IMG_DIR}">
@@ -200,6 +200,7 @@
                 <if>
                     <available file="${SRC_IMG_DIR}/slides" type="dir" />
                     <then>
+                        <mkdir dir="${DIST_IMG_DIR}/slides" />
                         <apply executable="/usr/bin/optipng" dest="${DIST_IMG_DIR}/slides" osfamily="unix">
                             <fileset dir="${SRC_IMG_DIR}/slides" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
                             <arg value="-quiet"/>
@@ -233,10 +234,20 @@
                         <srcfile/>
                         <mapper type="identity"/>
                     </apply>
+                    <apply executable="${OPTI}" dest="${DIST_ICO_DIR}" osfamily="windows">
+                        <fileset dir="${SRC_ICO_DIR}" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
+                        <arg value="-quiet"/>
+                        <arg value="-o7"/>
+                        <arg value="-out"/>
+                        <targetfile/>
+                        <srcfile/>
+                        <mapper type="identity"/>
+                    </apply>
 
                     <if>
                         <available file="${SRC_IMG_DIR}/slides" type="dir" />
                     <then>
+                        <mkdir dir="${DIST_IMG_DIR}/slides" />
                         <apply executable="${OPTI}" dest="${DIST_IMG_DIR}/slides" osfamily="windows">
                             <fileset dir="${SRC_IMG_DIR}/slides" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
                             <arg value="-quiet"/>

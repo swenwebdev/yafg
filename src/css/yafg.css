@@ -32,17 +32,17 @@ object { max-width: 100%; }
    ============================================================================= */
 
 /**
-* grid is designed for the mobile first approach
-* every span has a width of 100% of its parent
-**/
+ * grid is designed for the mobile first approach
+ * every span has a width of 100% of its parent
+ */
 
 /* overflow hidden should prevent glitches with jquery animations */
 .row { width: 100%; overflow: hidden; }
 
 /** 
-* clearfix to prevent collapsing heights for every
-* row because elements of the span class are all floatet 
-**/
+ * clearfix to prevent collapsing heights for every
+ * row because elements of the span class are all floatet 
+ */
 .row:before,
 .row:after {
     content:"";
@@ -56,9 +56,9 @@ object { max-width: 100%; }
 }
 
 /** 
-* [class*='span'] selector selects all elements which 
-* starts with "span" and applies the css attributs 
-**/
+ * [class*='span'] selector selects all elements which 
+ * starts with "span" and applies the css attributs 
+ */
 [class*='span'] { 
 		width: 100%;
 		margin-right: 0;
@@ -70,9 +70,9 @@ object { max-width: 100%; }
 }
 
 /** 
-* devices with a resolution equal or greater
-* then 769px get the following layout 
-**/
+ * devices with a resolution equal or greater
+ * then 769px get the following layout 
+ */
 
 /* breakpoint
    ============================================================================= */
